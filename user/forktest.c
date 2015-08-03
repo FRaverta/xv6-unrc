@@ -26,6 +26,8 @@ forktest(void)
       break;
     if(pid == 0)
       exit();
+    if(n == 4)
+      procstat();        
   }
   
   if(n == N){

@@ -89,3 +89,11 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+//print a list of process and their states  
+int 
+sys_procstat(void)
+{
+  procdump();
+  return 0;
+}
