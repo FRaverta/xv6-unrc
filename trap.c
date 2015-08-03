@@ -103,10 +103,8 @@ trap(struct trapframe *tf)
   // Force process to give up CPU on clock tick.
   // If interrupts were on while locks held, would need to check nlock.
   if(proc && proc->state == RUNNING && tf->trapno == T_IRQ0+IRQ_TIMER){
-    if (proc->pquantum == QUANTUM){  
-      cprintf("Proc %d yield con p.quantum:%d \n", proc->pid,proc->pquantum);
+    if (proc->pquantum == QUANTUM)
       yield();
-    }
     else
       proc->pquantum++;
   }
