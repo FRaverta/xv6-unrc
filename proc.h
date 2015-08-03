@@ -67,6 +67,14 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   uint pquantum;               // Process quantum
+  uint mlf_level;              // multilevel queue level (for scheduler)
+  struct proc* next;           // next process in the same priority queue. next != 0 => p.state=RUNNABLE 
+};
+
+//Queue
+struct list{
+  struct proc* head; //process priority queue's head
+  struct proc* last; //process priority queue's end
 };
 
 // Process memory is laid out contiguously, low addresses first:

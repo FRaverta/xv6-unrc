@@ -97,3 +97,16 @@ sys_procstat(void)
   procdump();
   return 0;
 }
+
+int
+sys_set_priority(void)
+{
+  int priority;
+
+  argint(0,&priority);
+  if(priority >= 0 && priority < LEVELS)
+    proc-> mlf_level = priority;
+  else //if priority isn't valid return an error code
+    return -1;
+  return 0;
+}

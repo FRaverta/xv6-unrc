@@ -10,7 +10,54 @@
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
+  struct list mlf[LEVELS]; //multilevel feedback processes queue
 } ptable;
+
+//Set process p as RUNNABLE and enqueue a p in
+//mlf queue into level p.mlf_level.
+static void
+enqueue(struct proc* p)
+{
+  p->state = RUNNABLE;
+  p->next= 0; //process will be enqueue(at the end) so it won't next process
+  struct list* l = &(ptable.mlf[p->mlf_level]);
+  if (l->head == 0) //if mlf queue is empty
+    l->head = p;
+  else
+    l->last->next = p;
+  l->last = p;
+}
+
+//Dequeue a process from mlf queue's mlf_level 
+static struct proc*
+dequeue(int mlf_level)
+{
+  struct proc* p;
+  struct list* l = ptable.mlf + mlf_level;
+
+  //Queue can't be empty
+  if (l->head == 0)
+    panic("MULTILEVEL FEEDBACK PROCESS QUEUE IS EMPTY");
+
+  if (l->head == l->last)//there is a unique element in queue
+    l->last = 0;
+  p = l->head;
+  l->head = l->head->next;
+  //process was dequeue, now it hasn't next process
+  p->next = 0;
+  return p;
+}
+
+//Return 1 if queue in mlf_level is empty
+static int
+is_empty(int mlf_level)
+{
+  if (ptable.mlf[mlf_level].head)
+    return 0;
+  else
+    return 1;
+}
+
 
 static struct proc *initproc;
 
@@ -99,7 +146,8 @@ userinit(void)
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
 
-  p->state = RUNNABLE;
+  p->mlf_level = 0; //set max priority for the first user process
+  enqueue(p); 
 }
 
 // Grow current process's memory by n bytes.
@@ -160,7 +208,8 @@ fork(void)
 
   // lock to force the compiler to emit the np->state write last.
   acquire(&ptable.lock);
-  np->state = RUNNABLE;
+  np->mlf_level = 0; //set process priority to max
+  enqueue(np); //enqueue new runnable process
   release(&ptable.lock);
   
   return pid;
@@ -265,6 +314,7 @@ wait(void)
 void
 scheduler(void)
 {
+  int l;
   struct proc *p;
 
   for(;;){
@@ -273,9 +323,14 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    for(l = 0; l < LEVELS; l++){
+      if (!is_empty(l))
+        p = dequeue(l);
+      else
+        continue;//continue with next level
+
       if(p->state != RUNNABLE)
-        continue;
+        panic("p->state != RUNNABLE");
 
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
@@ -290,6 +345,7 @@ scheduler(void)
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       proc = 0;
+      break; //break current loop for start with level 0 again.
     }
     release(&ptable.lock);
 
@@ -321,7 +377,12 @@ void
 yield(void)
 {
   acquire(&ptable.lock);  //DOC: yieldlock
-  proc->state = RUNNABLE;
+  //If yield() is executed our policy 
+  //is down current process's priority level,
+  //if it is possible
+  if(proc->mlf_level < LEVELS-1)
+    proc->mlf_level++;
+  enqueue(proc);// enqueue current process again for next execution
   sched();
   release(&ptable.lock);
 }
@@ -392,8 +453,14 @@ wakeup1(void *chan)
   struct proc *p;
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if(p->state == SLEEPING && p->chan == chan)
-      p->state = RUNNABLE;
+    if(p->state == SLEEPING && p->chan == chan){
+      //If wakeUp is executed our policy
+      //is up current process's priority level,
+      //if it is possible
+      if(p->mlf_level > 0)
+        p->mlf_level--;
+      enqueue(p);
+    }
 }
 
 // Wake up all processes sleeping on chan.
@@ -419,7 +486,7 @@ kill(int pid)
       p->killed = 1;
       // Wake process from sleep if necessary.
       if(p->state == SLEEPING)
-        p->state = RUNNABLE;
+        enqueue(p);
       release(&ptable.lock);
       return 0;
     }

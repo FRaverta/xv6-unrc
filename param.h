@@ -11,4 +11,5 @@
 #define LOGSIZE      (MAXOPBLOCKS*3)  // max data sectors in on-disk log
 #define NBUF         (MAXOPBLOCKS*3)  // size of disk block cache
 #define QUANTUM						4   // number of ticks before context switching
+#define LEVELS       4   // amount of levels in multilevel feedback table
 
