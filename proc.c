@@ -283,6 +283,7 @@ scheduler(void)
       proc = p;
       switchuvm(p);
       p->state = RUNNING;
+      p->pquantum = 0; //reset process quantum
       swtch(&cpu->scheduler, proc->context);
       switchkvm();
 
