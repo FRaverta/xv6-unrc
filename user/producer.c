@@ -1,6 +1,6 @@
 /*
-Program that represents a producer.
-	*producer full empty file value (where full,empty and file are the semapores's ids creates by maincp and value is a value that write producer)
+* Program that represents a producer.
+* producer file_name full empty file value (where full,empty and file are the semapores's ids creates by maincp and value is a value that write producer)
 */
 #include "param.h"
 #include "types.h"
@@ -35,7 +35,6 @@ main(int argc,char *argv[]){
 	int fd;
 	int nro;
 	char* file_name;
-	int i;
 
 	if(argc < 6){printf(1,"use producer file_name full empty file element_that_produce\n");exit();}
 	
@@ -64,7 +63,7 @@ main(int argc,char *argv[]){
 	}
 	printf(1,"Semaphores have been created\n");
 	
-
+	int i;
 	//producer loop
 	for(i=0;i<10;i++){
 			semdown(full);

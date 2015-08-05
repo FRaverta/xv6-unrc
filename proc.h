@@ -71,6 +71,7 @@ struct proc {
   struct proc* next;           // next process in the same priority queue. next != 0 => p.state=RUNNABLE 
   int sems[MAXSEMPROC];        // Array of process's semaphores id
   int amountcsems;             // Amount of sempahores that process is using
+  uint stack_pages_alloked;    // Amount of pages alloked. It must be <= PAGSTACKPROC 
 };
 
 //Queue

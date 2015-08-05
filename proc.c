@@ -200,6 +200,8 @@ fork(void)
   }
   np->sz = proc->sz;
   np->parent = proc;
+  //init amount of stack pages
+  np->stack_pages_alloked = proc->stack_pages_alloked;
   *np->tf = *proc->tf;
 
   // Clear %eax so that fork returns 0 in the child.

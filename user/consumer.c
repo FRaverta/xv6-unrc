@@ -1,6 +1,7 @@
 /*
-Program that represents a consumer.
-	*consumer full empty file (where full,empty and file are the semapores creates by maincp)
+* Program that represents a consumer.
+* consumer file_name full empty file (where full,empty and file are the semapores creates by maincp)
+* 
 */
 
 #include "param.h"
@@ -13,7 +14,7 @@ Program that represents a consumer.
 #include "traps.h"
 #include "memlayout.h"
 
-//auxiliar function to report errors abaout semaphore use
+//auxiliar function to report errors about semaphore use
 void
 report_errors(int s)
 {
@@ -36,7 +37,6 @@ main(int argc,char *argv[]){
 	int fd;
 	int c;
 	char* file_name;
-	int i;
 
 	if(argc < 5){printf(1,"use consumer file_name full empty file\n");exit();}
 	
@@ -66,6 +66,7 @@ main(int argc,char *argv[]){
 
 	
 	//consumer loop
+	int i;
 	for(i=0;i<10;i++){
 		semdown(empty);
 		semdown(file);
@@ -73,9 +74,7 @@ main(int argc,char *argv[]){
 			read(fd,&c,sizeof(c)); //consume
 			printf(1,"consumer %d\n",c);
 		semup(file);				
-		semup(full);
-		
+		semup(full);		
 	}
 	exit();
-	
 }
