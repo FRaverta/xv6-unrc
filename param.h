@@ -12,4 +12,6 @@
 #define NBUF         (MAXOPBLOCKS*3)  // size of disk block cache
 #define QUANTUM						4   // number of ticks before context switching
 #define LEVELS       4   // amount of levels in multilevel feedback table
+#define MAXSEM       5   // amount of semaphores in the OS
+#define MAXSEMPROC   4   // amount of semaphores available per process
 

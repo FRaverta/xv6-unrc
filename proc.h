@@ -69,6 +69,8 @@ struct proc {
   uint pquantum;               // Process quantum
   uint mlf_level;              // multilevel queue level (for scheduler)
   struct proc* next;           // next process in the same priority queue. next != 0 => p.state=RUNNABLE 
+  int sems[MAXSEMPROC];        // Array of process's semaphores id
+  int amountcsems;             // Amount of sempahores that process is using
 };
 
 //Queue

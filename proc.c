@@ -71,6 +71,7 @@ void
 pinit(void)
 {
   initlock(&ptable.lock, "ptable");
+  seminit();//init semaphores
 }
 
 //PAGEBREAK: 32
@@ -116,6 +117,13 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
+
+  //init sempahores descriptors as empty
+  int i;
+
+  for(i=0;i<MAXSEMPROC;i++) 
+    p->sems[i] = -1;
+  p->amountcsems = 0;
 
   return p;
 }
@@ -222,7 +230,7 @@ void
 exit(void)
 {
   struct proc *p;
-  int fd;
+  int fd,s;
 
   if(proc == initproc)
     panic("init exiting");
@@ -235,6 +243,11 @@ exit(void)
     }
   }
 
+  //free all semaphores
+  for(s = 0; s < MAXSEMPROC; s++)
+     if(proc->sems[s] != -1)
+       semfree(proc->sems[s]);
+        
   begin_op();
   iput(proc->cwd);
   end_op();

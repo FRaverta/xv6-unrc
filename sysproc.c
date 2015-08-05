@@ -110,3 +110,40 @@ sys_set_priority(void)
     return -1;
   return 0;
 }
+
+int
+sys_semget(void)
+{
+  int  sem_id, init_value;
+
+  argint(0,&sem_id);
+  argint(1,&init_value);
+  return semget(sem_id,init_value);
+}
+
+int 
+sys_semfree(void)
+{
+  int sem_id;
+
+  argint(0,&sem_id);
+  return semfree(sem_id);
+}
+
+int
+sys_semdown(void)
+{
+  int sem_id;
+
+  argint(0,&sem_id);
+  return semdown(sem_id);
+}
+
+int 
+sys_semup(void)
+{
+  int sem_id;
+
+  argint(0,&sem_id);
+  return semup(sem_id);
+}

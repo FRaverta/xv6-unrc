@@ -179,5 +179,12 @@ void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
 
+// semaphore.c
+void seminit();
+int semget(int sem_id, int init_value);
+int semfree(int sem_id);
+int semdown(int sem_id);
+int semup(int sem_id);
+
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
