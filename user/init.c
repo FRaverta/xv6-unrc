@@ -18,7 +18,10 @@ main(void)
   }
   dup(0);  // stdout
   dup(0);  // stderr
-
+  if(open("rtc",O_RDWR) < 0){
+    mknod("rtc",5,1);
+    open("rtc",O_RDWR);
+  }
   for(;;){
     printf(1, "init: starting sh\n");
     pid = fork();

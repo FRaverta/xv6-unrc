@@ -29,6 +29,7 @@ int semget(int,int);
 int semfree(int);
 int semdown(int);
 int semup(int);
+int fseek(int,int);
 
 // ulib.c
 int stat(char*, struct stat*);

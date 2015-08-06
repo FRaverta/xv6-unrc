@@ -154,3 +154,16 @@ filewrite(struct file *f, char *addr, int n)
   panic("filewrite");
 }
 
+//set logical cursor position in a file
+int
+fileseek(struct file *f, int pos)
+{
+  if (pos > f->ip->size){//check that the position is in the file.
+    cprintf("Size error: Logical cursor of file positioned at the end \n");  
+    f->off= f->ip->size; //return offset in final file.
+  }
+  ilock(f->ip);
+  f->off = pos; //Moves the logical cursor of file to the specified position.
+  iunlock(f->ip);
+  return 0;
+}

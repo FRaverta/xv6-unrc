@@ -32,7 +32,7 @@ void            fileinit(void);
 int             fileread(struct file*, char*, int n);
 int             filestat(struct file*, struct stat*);
 int             filewrite(struct file*, char*, int n);
-
+int             fileseek(struct file*, int n);
 // fs.c
 void            readsb(int dev, struct superblock *sb);
 int             dirlink(struct inode*, char*, uint);
@@ -180,11 +180,14 @@ int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
 
 // semaphore.c
-void seminit();
-int semget(int sem_id, int init_value);
-int semfree(int sem_id);
-int semdown(int sem_id);
-int semup(int sem_id);
+void            seminit();
+int             semget(int sem_id, int init_value);
+int             semfree(int sem_id);
+int             semdown(int sem_id);
+int             semup(int sem_id);
+
+//rtc.c
+void            rtcinit(void);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

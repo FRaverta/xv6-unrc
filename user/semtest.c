@@ -25,24 +25,27 @@ int main(int argc, char *argv[]){
 		semget(empty,0);
 		for(i=0;i<12;i++){			
 			semdown(full);
-			fd=open("number.txt",O_RDWR);//reopen for reset file descriptor
+			fseek(fd,0); //move logical cursor to the begin
 			write(fd,&i,sizeof(i));
 			printf(1,"producer %d\n",i );
 			semup(empty);
-
 		}
 	}else{//consumer
 		int c;
 		int i;
 		for(i=0;i<12;i++){			
 			semdown(empty);
-			fd=open("number.txt",O_RDWR);//reopen for reset file descriptor		
+			fseek(fd,0); //move logical cursor to the begin
 			read(fd,&c,sizeof(c));
 			printf(1,"consumer %d\n",c);			
 			semup(full);
 		}
 		wait();
 	}
+	int c;
+	fseek(fd,0);
+	read(fd,&c,sizeof(c));
+	printf(1,"Finaly %d\n",c);
 	close(fd);//close file
 	exit();
 }

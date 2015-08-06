@@ -36,6 +36,7 @@ struct devsw {
 extern struct devsw devsw[];
 
 #define CONSOLE 1
+#define RTC     5
 
 //PAGEBREAK!
 // Blank page.

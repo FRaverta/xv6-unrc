@@ -440,3 +440,16 @@ sys_pipe(void)
   fd[1] = fd1;
   return 0;
 }
+
+int
+sys_fseek(void)
+{
+  struct file *f;
+  int pos,fd;
+
+  if(argint (0,&fd)<0||argint(1, &pos) < 0 || argfd(0,&fd,&f) < 0){
+    cprintf("Incorrect call to fseek\n");
+    return -1;
+  } //Check position and that file description in file.
+  return fileseek(f,pos);
+}
