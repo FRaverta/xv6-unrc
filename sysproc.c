@@ -147,3 +147,31 @@ sys_semup(void)
   argint(0,&sem_id);
   return semup(sem_id);
 }
+
+int
+sys_shm_get(void)
+{
+  int key;
+  //void **addr;
+
+  argint(0,&key);
+  //argptr(1,&addr,sizeof(*addr));
+
+  return -1;
+}
+
+int
+sys_shm_close(void)
+{
+  return -1;
+}
+
+int
+sys_shm_create(void)
+{
+  int size;
+
+  argint(0,&size);
+  return shm_create(size);
+
+}

@@ -58,20 +58,21 @@ struct proc {
   char *kstack;                // Bottom of kernel stack for this process
   enum procstate state;        // Process state
   int pid;                     // Process ID
-  struct proc *parent;         // Parent process
-  struct trapframe *tf;        // Trap frame for current syscall
-  struct context *context;     // swtch() here to run process
-  void *chan;                  // If non-zero, sleeping on chan
-  int killed;                  // If non-zero, have been killed
-  struct file *ofile[NOFILE];  // Open files
-  struct inode *cwd;           // Current directory
-  char name[16];               // Process name (debugging)
-  uint pquantum;               // Process quantum
-  uint mlf_level;              // multilevel queue level (for scheduler)
-  struct proc* next;           // next process in the same priority queue. next != 0 => p.state=RUNNABLE 
-  int sems[MAXSEMPROC];        // Array of process's semaphores id
-  int amountcsems;             // Amount of sempahores that process is using
-  uint stack_pages_alloked;    // Amount of pages alloked. It must be <= PAGSTACKPROC 
+  struct proc *parent;          // Parent process
+  struct trapframe *tf;         // Trap frame for current syscall
+  struct context *context;      // swtch() here to run process
+  void *chan;                   // If non-zero, sleeping on chan
+  int killed;                   // If non-zero, have been killed
+  struct file *ofile[NOFILE];   // Open files
+  struct inode *cwd;            // Current directory
+  char name[16];                // Process name (debugging)
+  uint pquantum;                // Process quantum
+  uint mlf_level;               // multilevel queue level (for scheduler)
+  struct proc* next;            // next process in the same priority queue. next != 0 => p.state=RUNNABLE 
+  int sems[MAXSEMPROC];         // Array of process's semaphores id
+  int amountcsems;              // Amount of sempahores that process is using
+  uint stack_pages_alloked;     // Amount of pages alloked. It must be <= PAGSTACKPROC
+  int shm_blocks[MAXSHMPROC];   // id's of shared memory blocks 
 };
 
 //Queue

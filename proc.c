@@ -72,6 +72,7 @@ pinit(void)
 {
   initlock(&ptable.lock, "ptable");
   seminit();//init semaphores
+  shm_init();//init shared memory
 }
 
 //PAGEBREAK: 32
@@ -121,9 +122,13 @@ found:
   //init sempahores descriptors as empty
   int i;
 
-  for(i=0;i<MAXSEMPROC;i++) 
+  for(i = 0; i < MAXSEMPROC; i++) 
     p->sems[i] = -1;
   p->amountcsems = 0;
+
+  //init shared memory descriptors as empty
+  for(i = 0; i < MAXSHMPROC; i++)
+    p->shm_blocks[i] = -1;
 
   return p;
 }

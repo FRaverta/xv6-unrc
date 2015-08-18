@@ -14,4 +14,7 @@
 #define LEVELS         4  // amount of levels in multilevel feedback table
 #define MAXSEM         5  // amount of semaphores in the OS
 #define MAXSEMPROC     4  // amount of semaphores available per process
-#define PAGSTACKPROC  3  // maximun amount of memory pages for stack per process
+#define PAGSTACKPROC   3  // maximun amount of memory pages for stack per process
+#define MAXSHM         10 // maximun amount of shared memory blocks in OS
+#define MAXSHMPROC     2  // maximum amount of shared memory blocks per process in OS 
+#define MAXSHMPBLOCK   4  // maximum amount of pages in shared memory block       

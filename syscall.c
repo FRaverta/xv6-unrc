@@ -105,6 +105,10 @@ extern int sys_semfree(void);
 extern int sys_semdown(void);
 extern int sys_semup(void);
 extern int sys_fseek(void);
+extern int sys_shm_get(void);
+extern int sys_shm_close(void);
+extern int sys_shm_create(void);
+
 
 static int (*syscalls[])(void) = {
 [SYS_fork]         sys_fork,
@@ -135,6 +139,9 @@ static int (*syscalls[])(void) = {
 [SYS_semdown]      sys_semdown,
 [SYS_semup]        sys_semup, 
 [SYS_fseek]        sys_fseek,   
+[SYS_shm_get]      sys_shm_get,
+[SYS_shm_close]    sys_shm_close,
+[SYS_shm_create]   sys_shm_create,
 };
 
 void

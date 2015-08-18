@@ -29,6 +29,7 @@ OBJS = \
 	vm.o\
 	semaphore.o\
 	rtc.o\
+	sharedmem.o\
 
 # Cross-compiling (e.g., on Mac OS X)
 # TOOLPREFIX = i386-jos-elf
@@ -181,6 +182,7 @@ UPROGS=\
 	_producer\
 	_recursion\
 	_date\
+	_prueba\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -250,7 +252,7 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
 EXTRA=\
 	mkfs.c user/ulib.c user/user.h user/cat.c user/echo.c user/forktest.c user/grep.c user/kill.c\
 	user/ln.c user/ls.c user/mkdir.c user/rm.c user/stressfs.c user/usertests.c user/wc.c user/zombie.c\
-	user/printf.c user/umalloc.c user/loop.c user/semtest.c user/maincp.c user/consumer.c user/producer.c user/recursion.c user/date.c\
+	user/printf.c user/umalloc.c user/loop.c user/semtest.c user/maincp.c user/consumer.c user/producer.c user/recursion.c user/date.c user/prueba.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 

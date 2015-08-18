@@ -178,6 +178,8 @@ void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
+int             shm_allocuvm(pde_t *pgdir, uint oldsz, uint newsz,int block_id);
+
 
 // semaphore.c
 void            seminit();
@@ -188,6 +190,14 @@ int             semup(int sem_id);
 
 //rtc.c
 void            rtcinit(void);
+
+//sharedmem.c
+int             shm_get(int key, void **addr);
+int             shm_create(int size);
+int             shm_close(int key);
+int             shm_freeblock(int key);
+int             shm_assign_page_to_block(int key,char* mem);
+int             shm_init();
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

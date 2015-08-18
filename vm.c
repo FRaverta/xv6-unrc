@@ -7,6 +7,7 @@
 #include "proc.h"
 #include "elf.h"
 
+
 extern char data[];  // defined by kernel.ld
 pde_t *kpgdir;  // for use in scheduler()
 struct segdesc gdt[NSEGS];
@@ -80,7 +81,7 @@ mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm)
       return -1;
     if(*pte & PTE_P)
       panic("remap");
-    *pte = pa | perm | PTE_P;
+    *pte = pa | perm | PTE_P; // | is an or logic bit-wise, physical addr, permisions and 0x001
     if(a == last)
       break;
     a += PGSIZE;
@@ -223,7 +224,7 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   char *mem;
   uint a;
 
-  if(newsz >= KERNBASE)
+  if(newsz >= SHMMEMORYBASE) //proc can address KERNBASE - shared memory space
     return 0;
   if(newsz < oldsz)
     return oldsz;
@@ -375,6 +376,44 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
     va = va0 + PGSIZE;
   }
   return 0;
+}
+
+
+// Allocate shared page tables and physical memory to grow process from oldsz to
+// newsz, which need not be page aligned.  Returns new size or 0 on error.
+int
+shm_allocuvm(pde_t *pgdir, uint oldsz, uint newsz,int block_id)
+{
+  char *mem;
+  uint a;
+
+  if(oldsz < SHMMEMORYBASE)
+    panic("Boludo estas asignando memoria compartida abajo del base");
+  if(newsz >= KERNBASE)
+    return 0;
+  if(newsz < oldsz)
+    return oldsz;
+
+  a = PGROUNDUP(oldsz);
+  for(; a < newsz; a += PGSIZE){
+    mem = kalloc();
+    if(mem == 0){
+      cprintf("allocuvm out of memory\n");
+      deallocuvm(pgdir, newsz, oldsz);
+    
+       //Free shared memory block    
+      shm_freeblock(block_id);
+      return 0;
+    }
+
+    memset(mem, 0, PGSIZE);
+    mappages(pgdir, (char*)a, PGSIZE, v2p(mem), PTE_W|PTE_U);
+    
+    //modified so shared block table
+    shm_assign_page_to_block(block_id,mem);    
+    
+  }
+  return newsz;
 }
 
 //PAGEBREAK!
