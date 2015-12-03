@@ -16,7 +16,6 @@ and consumer reads these.
 int main(int argc, char *argv[]){
 	int fd;
 	fd=open("number.txt",O_CREATE|O_RDWR);
-	close(fd);
 	int full= semget(-1,1);
 	int empty= semget(-1,0);
 	if(fork()==0){//producer		
