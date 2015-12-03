@@ -216,12 +216,18 @@ fork(void)
  
   pid = np->pid;
 
+
+  // copy father's semaphores 
+  if (copy_sem_descriptor(proc,np) < 0)
+    panic("fork: error in copy semaphores descriptors");
+
   // lock to force the compiler to emit the np->state write last.
   acquire(&ptable.lock);
   np->mlf_level = 0; //set process priority to max
   enqueue(np); //enqueue new runnable process
   release(&ptable.lock);
   
+
   return pid;
 }
 
