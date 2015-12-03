@@ -224,7 +224,7 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   char *mem;
   uint a;
 
-  if(newsz >= SHMMEMORYBASE) //proc can address KERNBASE - shared memory space
+  if(newsz >= KERNBASE)
     return 0;
   if(newsz < oldsz)
     return oldsz;
@@ -379,42 +379,86 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
 }
 
 
+//map physical pages starting at start_va_shr
+int
+shm_from_allocuvm(pde_t *pgdir, uint start_va_shr, char* pages[], uint amount_pages){
+  int j;
+  
+  for(j=0; j < amount_pages; j++)
+    mappages(pgdir, (void*) (start_va_shr + (j * PGSIZE)) , PGSIZE, v2p(pages[j]), PTE_W|PTE_U);
+
+  return 0;
+}
+
 // Allocate shared page tables and physical memory to grow process from oldsz to
 // newsz, which need not be page aligned.  Returns new size or 0 on error.
 int
-shm_allocuvm(pde_t *pgdir, uint oldsz, uint newsz,int block_id)
+shm_allocuvm(pde_t *pgdir,char* pages[], uint amount_pages)
 {
-  char *mem;
-  uint a;
+  uint sz = PGROUNDUP(cpu->proc->sz);
+  pte_t *pte;
+  uint start_va_shr;
+  uint j;
 
-  if(oldsz < SHMMEMORYBASE)
-    panic("Boludo estas asignando memoria compartida abajo del base");
-  if(newsz >= KERNBASE)
-    return 0;
-  if(newsz < oldsz)
-    return oldsz;
-
-  a = PGROUNDUP(oldsz);
-  for(; a < newsz; a += PGSIZE){
-    mem = kalloc();
-    if(mem == 0){
-      cprintf("allocuvm out of memory\n");
-      deallocuvm(pgdir, newsz, oldsz);
-    
-       //Free shared memory block    
-      shm_freeblock(block_id);
-      return 0;
+  for(start_va_shr =  sz; start_va_shr <= KERNBASE - (amount_pages * PGSIZE) ; start_va_shr += PGSIZE){
+    for(j = 0; j < amount_pages; j++){
+      pte = walkpgdir(pgdir, (void*) (start_va_shr + (j * PGSIZE)) , 0);
+      if (*pte & PTE_P){
+        start_va_shr +=  j * PGSIZE;
+        break;
+      }
     }
-
-    memset(mem, 0, PGSIZE);
-    mappages(pgdir, (char*)a, PGSIZE, v2p(mem), PTE_W|PTE_U);
-    
-    //modified so shared block table
-    shm_assign_page_to_block(block_id,mem);    
-    
+    if (j == amount_pages)
+      break;
   }
-  return newsz;
+
+  if(start_va_shr > KERNBASE - (amount_pages * PGSIZE))
+    return -1;
+
+  //map physical pages starting at start_va_shr 
+  shm_from_allocuvm(proc->pgdir,start_va_shr, pages, amount_pages);
+
+
+  cprintf("start_va_shr: %d\n proc.sz:%d\n ",start_va_shr,sz);
+  return start_va_shr;
 }
+
+//Unmap virtual address in pgdir from va to va + size.
+//If freeframes != 0, free physical pages also.  
+int 
+unmappages(pde_t *pgdir, void *va, uint size, int freeframes)
+{
+  uint a,pa;
+  pte_t *pte;
+
+  if(pgdir == 0)
+    panic("unmappages: no pgdir");
+
+  for(a = (uint) va; a  < ((uint) va) + size; a += PGSIZE){
+    pte = walkpgdir(pgdir, (char*)a, 0);
+    cprintf("page %d\n size %d\n",va,size);
+    if(pte == 0)
+      panic("unmappages: unmap page at pgdir not present");
+
+    if(freeframes != 0){
+      if((*pte & PTE_P) != 0){
+        pa = PTE_ADDR(*pte);
+        if(pa == 0)
+          panic("unmappages:kfree");
+        char *v = p2v(pa);
+        kfree(v);
+      }else 
+        panic("unmappages: unmap page not present");
+    }
+    *pte = 0;
+  }
+  return 0;
+}
+
+
+
+
+
 
 //PAGEBREAK!
 // Blank page.

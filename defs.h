@@ -178,7 +178,9 @@ void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
-int             shm_allocuvm(pde_t *pgdir, uint oldsz, uint newsz,int block_id);
+int             shm_allocuvm(pde_t *pgdir, char* pages[], uint amount_of_pages);
+int             shm_from_allocuvm(pde_t *pgdir, uint start_va_shr, char* pages[], uint amount_pages);
+int             unmappages(pde_t *pgdir, void *va, uint size, int freeframes);
 
 
 // semaphore.c
@@ -198,6 +200,7 @@ int             shm_close(int key);
 int             shm_freeblock(int key);
 int             shm_assign_page_to_block(int key,char* mem);
 int             shm_init();
+int             copy_shm_descriptor(struct proc* pidfrom,struct proc* pidto);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

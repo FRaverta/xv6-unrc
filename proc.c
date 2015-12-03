@@ -128,7 +128,7 @@ found:
 
   //init shared memory descriptors as empty
   for(i = 0; i < MAXSHMPROC; i++)
-    p->shm_blocks[i] = -1;
+    (p->shm_blocks[i]).block_id = -1;
 
   return p;
 }
@@ -217,6 +217,10 @@ fork(void)
       np->ofile[i] = filedup(proc->ofile[i]);
   np->cwd = idup(proc->cwd);
 
+  //copy father shared memory descriptors and virtual mapping
+  if(copy_shm_descriptor(proc,np) != 0)
+    panic("Fork: error in copy shared memory descriptors");
+
   safestrcpy(np->name, proc->name, sizeof(proc->name));
  
   pid = np->pid;
@@ -254,6 +258,11 @@ exit(void)
   for(s = 0; s < MAXSEMPROC; s++)
      if(proc->sems[s] != -1)
        semfree(proc->sems[s]);
+
+  //free all shm_blocks
+  for(s = 0; s < MAXSHMPROC; s++)
+     if(proc->shm_blocks[s].block_id != -1)
+       shm_close(proc->shm_blocks[s].block_id);
         
   begin_op();
   iput(proc->cwd);

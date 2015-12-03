@@ -151,19 +151,21 @@ sys_semup(void)
 int
 sys_shm_get(void)
 {
-  int key;
-  //void **addr;
+  int key, addr;
 
   argint(0,&key);
-  //argptr(1,&addr,sizeof(*addr));
+  argint(1,&addr);
 
-  return -1;
+  return shm_get(key,(void**) addr);
 }
 
 int
 sys_shm_close(void)
 {
-  return -1;
+  int key;
+
+  argint(0,&key);
+  return shm_close(key);
 }
 
 int
