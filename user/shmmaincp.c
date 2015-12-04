@@ -62,14 +62,14 @@ main(int argc,char *argv[]){
 
 	size = atoi(argv[1]);
 	
-	if(argc<2){
+	if(argc!=2){
 		printf(1,"use shmmaincp amount_of_pages \n");	
 		exit();
 	}
 
 	//create shm block and reports the result of this operation
 	shmbd = shm_create(size * PGSIZE);
-	if (shmbd < 0){report_shmcreate_errors(shmbd * PGSIZE); exit();}
+	if (shmbd < 0){report_shmcreate_errors(shmbd); exit();}
 
 	if( (aux = shm_get(shmbd,&addr)) <0 ) {report_shmget_errors(aux); exit();}
 	else printf(1,"shm block was get\n");
