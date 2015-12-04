@@ -211,6 +211,27 @@ semup(int sem_id)
 	return 0;
 }
 
+/*
+Error
+	-1 sem_id isn't a semaphore used by current process
+	-2 sem_i<0 so sem_id isn't a correct semaphore id.
+*/
+int
+semgetvalue(int sem_id, int *valp)
+{
+
+	if(sem_id<0) return -2;
+
+	if(!isSemOwnerProc(sem_id)) return -1; //notify that it isn't a process's semaphore
+	
+	acquire(&semtable.lock);
+	struct semaphore *s= &semtable.list[sem_id];
+	*valp = s->value;//get semaphore value
+ 	release(&semtable.lock);
+
+ 	return 0;
+}
+
 int 
 copy_sem_descriptor(struct proc* pfrom,struct proc* pto)
 {

@@ -190,6 +190,7 @@ int             semfree(int sem_id);
 int             semdown(int sem_id);
 int             semup(int sem_id);
 int 			copy_sem_descriptor(struct proc* pfrom,struct proc* pto);
+int             semgetvalue(int sem_id, int *valp);
 
 //rtc.c
 void            rtcinit(void);

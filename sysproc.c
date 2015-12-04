@@ -148,6 +148,16 @@ sys_semup(void)
   return semup(sem_id);
 }
 
+int 
+sys_semgetvalue(void)
+{
+  int sem_id, valp;
+
+  argint(0,&sem_id);
+  argint(1,&valp);
+  return semgetvalue(sem_id, (int*) valp);
+}
+
 int
 sys_shm_get(void)
 {
