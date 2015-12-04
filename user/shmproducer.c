@@ -12,6 +12,7 @@
 #include "traps.h"
 #include "memlayout.h"
 
+#define element_that_produce 1000
 
 //auxiliar function to report errors abaout semaphore use
 void
@@ -32,6 +33,7 @@ report_shmget_errors(int s)
 		case -1: printf(1,"nroError:%d-current process has all shared memory blocks already busy.\n",s);break;
 		case -2: printf(1,"nroError:%d-Sharem memory block with key descriptor hasn't been created.",s);break; 
 		case -3: printf(1,"nroError:%d-Process haven't enought adresses space.",s);break;
+		case -4: printf(1,"nroError:%d-Invalid key in shm_get.",s);break;
 	}
 }	
 
@@ -79,7 +81,7 @@ main(int argc,char *argv[]){
 	
 	int i;
 	//producer loop
-	for(i=0;i<2000;i++){
+	for(i=0;i<element_that_produce;i++){
 			semdown(full);
 			semdown(shmblock_sem);				
 			pos = *((int*)addr);

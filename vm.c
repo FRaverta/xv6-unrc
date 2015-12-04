@@ -419,7 +419,6 @@ shm_allocuvm(pde_t *pgdir,char* pages[], uint amount_pages)
   shm_from_allocuvm(proc->pgdir,start_va_shr, pages, amount_pages);
 
 
-  cprintf("start_va_shr: %d\n proc.sz:%d\n ",start_va_shr,sz);
   return start_va_shr;
 }
 
@@ -436,7 +435,6 @@ unmappages(pde_t *pgdir, void *va, uint size, int freeframes)
 
   for(a = (uint) va; a  < ((uint) va) + size; a += PGSIZE){
     pte = walkpgdir(pgdir, (char*)a, 0);
-    cprintf("page %d\n size %d\n",va,size);
     if(pte == 0)
       panic("unmappages: unmap page at pgdir not present");
 

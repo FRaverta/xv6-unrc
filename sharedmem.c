@@ -8,7 +8,7 @@
 #include "traps.h"
 #include "spinlock.h"
 
-#define INVALID_START_VA 0xFFFFFFFF
+#define INVALID_START_VA LAST_ADDR
 
 struct shmblock{
   uint amount_of_pages; //amount of pages that block assign really < MAXSHMPBLOCK
@@ -16,9 +16,10 @@ struct shmblock{
   char* pages[MAXSHMPBLOCK]; //page's physical address + KERNBASE 
 };
 
+//SO's shared memory blocks table
 struct {
   struct spinlock shmlock;
-  struct shmblock blocks[MAXSHM]; 
+  struct shmblock blocks[MAXSHM];
 }shmtable;
 
 int
@@ -28,17 +29,18 @@ shm_init()
 
   initlock(&shmtable.shmlock,"shmtable");
   
-  for(i = 0; i<MAXSHM; i++){
+  for(i = 0; i < MAXSHM; i++){
   	 shmtable.blocks[i].amount_of_pages = 0;
   	 shmtable.blocks[i].references = -1;
   	 //free references to physical address (for care)
-    for(j=0 ; j<MAXSHMPBLOCK ;j++)
+    for(j = 0; j < MAXSHMPBLOCK ; j++)
       shmtable.blocks[i].pages[j] = 0;
   }
 
   return 0;
 }
 
+//Free SO shared memory block.
 //This method must be called with unique acess to shmtable.
 int
 shm_freeblock(int key)
@@ -50,7 +52,6 @@ shm_freeblock(int key)
     panic("free shared memory block not busy");
 
   shmtable.blocks[key].references = -1;
-
   shmtable.blocks[key].amount_of_pages = 0;
 
   //free references to physical address (for care)
@@ -59,6 +60,7 @@ shm_freeblock(int key)
   return 0;
 }
 
+//Assign pages to a block
 //This method must be called with unique acess to shmtable.
 int
 shm_assign_page_to_block(int key,char* mem)
@@ -72,13 +74,17 @@ shm_assign_page_to_block(int key,char* mem)
 //Obtain virtual address of block wich id  
 //is key in addr.
 // -1: current process has all shared memory blocks already busy.
-// -2: Sharem memory block with key descriptor hasn't been created.
+// -2: Shared memory block with key descriptor hasn't been created.
 // -3: Process haven't enought adresses space.
+// -4: invalid key
 int
 shm_get(int key, void **addr)
 {
   int proc_shmb_id;
   uint start_va;
+
+    if(key < 0 || key > MAXSHM)
+      return -4;
 
   //check if key is a id for some Shared Memory Block that has been already created.
   //tour so's shared memory block.
@@ -139,7 +145,7 @@ shm_close(int key)
 {
     int id;
 
-    if(key<0 || key>MAXSHM)
+    if(key < 0 || key > MAXSHM)
       return -2;
 
     for(id = 0; id < MAXSHMPROC; id++)
@@ -158,8 +164,8 @@ shm_close(int key)
     if ( shmtable.blocks[key].references == 0){
       unmappages(proc->pgdir, proc->shm_blocks[id].start_va, shmtable.blocks[key].amount_of_pages * PGSIZE , 1);
       //free SO's shared memory slot
-      shmtable.blocks[key].amount_of_pages = 0;
-      shmtable.blocks[key].references = -1;            
+      shm_freeblock(key);
+  
     }else
       unmappages(proc->pgdir, proc->shm_blocks[id].start_va, shmtable.blocks[key].amount_of_pages * PGSIZE , 0);
     
