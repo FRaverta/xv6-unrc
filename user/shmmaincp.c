@@ -62,7 +62,7 @@ main(int argc,char *argv[]){
 
 	size = atoi(argv[1]);
 	
-	if(argc<2){
+	if(argc!=2){
 		printf(1,"use shmmaincp amount_of_pages \n");	
 		exit();
 	}

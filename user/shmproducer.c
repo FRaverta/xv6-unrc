@@ -46,7 +46,7 @@ main(int argc,char *argv[]){
 	char c;
 	void * addr;
 
-	if(argc < 6){printf(1,"use shmproducer shmblock_descriptor full empty shmblock_sem element_that_produce\n");exit();}
+	if (argc != 6){printf(1,"There are more parameters\n use shmproducer shmblock_descriptor full empty shmblock_sem element_that_produce\n" );}
 	
 	//take all paramethers
 	shmbd = atoi(argv[1]);
