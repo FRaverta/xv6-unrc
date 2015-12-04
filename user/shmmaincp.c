@@ -68,7 +68,7 @@ main(int argc,char *argv[]){
 	}
 
 	//create shm block and reports the result of this operation
-	shmbd = shm_create(size);
+	shmbd = shm_create(size * PGSIZE);
 	if (shmbd < 0){report_shmcreate_errors(shmbd * PGSIZE); exit();}
 
 	if( (aux = shm_get(shmbd,&addr)) <0 ) {report_shmget_errors(aux); exit();}
@@ -91,7 +91,7 @@ main(int argc,char *argv[]){
 
 	*((int*) addr) = 3;
 	
-	printf(1,"shm block is created with id: %d\n",shmbd);
+	printf(1,"shm block is created with id: %d and it has %d pages\n",shmbd,size);
 	printf(1,"Semaphores have been created\n");
 	printf(1,"Full id:%d\n",full);
 	printf(1,"Empty id:%d\n",empty);
