@@ -46,7 +46,7 @@ main(int argc,char *argv[])
 	uint pos;
 	void * addr;
 
-	if(argc =! 5){printf(1,"use shmconsumer shmblock_descriptor full empty shmblock_sem \n");exit();}
+	if(argc != 5){printf(1,"use shmconsumer shmblock_descriptor full empty shmblock_sem \n");exit();}
 	
 	//take all paramethers
 	shmbd = atoi(argv[1]);
