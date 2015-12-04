@@ -42,6 +42,7 @@ int main(int argc, char *argv[]){
 }
 */
 
+/*
 int main(int argc, char *argv[]){
 	int d;
 	void* x;
@@ -85,3 +86,95 @@ int main(int argc, char *argv[]){
 	shm_close(d);
 	exit();
 }
+*/
+
+/*
+int main(int argc, char *argv[]){
+	int d;
+	void* x;
+	void* xx;
+	int i = 0;
+	int psize = 4096;
+	int size = psize * 1;
+	void* last_pos;
+
+	d=shm_create(size);
+	printf(0,"shared memory descriptor: %d\n",d);
+	shm_get(d, (void*) &x);
+	xx = x;	 
+	printf(0,"After get in proc: %d\n", ((int) x));
+	last_pos = size + x;
+	for(; x < last_pos; x += 4)		
+		*((int *) x) = i++;
+	
+	
+	if(fork()==0){		
+		int ii;
+		int* value;
+		int aux;
+
+		aux= 0;//shm_get(d, (void*) &xx);
+		if(aux<0)
+			printf(0,"Child Error: %d in get\n",aux);
+		else{
+			value =  xx;
+			//printf(0,"After get in child: %d\n",((int) xx));
+			printf(0,"Printing in child from address: %d\n",(int)value);
+			for(ii=0; ii < size; ii += 4){				
+				printf(0,"Printing in child from address: %d\n",(int) value);				
+				printf(0,"%d\n",*value);
+				value++;
+			}
+			printf(0,"End Printing in child at address: %d\n",(int) value--);		
+			//aux=shm_close(d);
+			printf(0,"Close in child %d \n",aux);		
+		}		
+	}
+	wait();
+
+	if(fork()==0){		
+		int ii;
+		int* value;
+		int aux;
+
+		aux= 0;//shm_get(d, (void*) &xx);
+		if(aux<0)
+			printf(0,"Child Error: %d in get\n",aux);
+		else{
+			value =  xx;
+			//printf(0,"After get in child: %d\n",((int) xx));
+			printf(0,"Printing in child from address: %d\n",(int)value);
+			for(ii=0; ii < size; ii += 4){
+				printf(0,"Printing in child from address: %d\n",(int) value);
+				printf(0,"%d\n",*value);
+				value++;
+			}
+			printf(0,"End Printing in child at address: %d\n",(int) value--);		
+			aux=shm_close(d);
+			printf(0,"Close in child %d \n",aux);		
+		}		
+	}
+	wait();	
+
+
+	shm_close(d);
+	exit();
+}
+
+*/
+#define size 10000*1024
+
+int a[size];
+
+int main(int argc, char *argv[]){
+	//pag totales 262144
+	//pag ocupas 5
+	//pag restantes 262141
+
+
+	a[1]=1;
+	printf(0,"%d\n", a[1]);
+	exit();
+}
+
+
