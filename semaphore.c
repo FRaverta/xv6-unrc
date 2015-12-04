@@ -210,3 +210,22 @@ semup(int sem_id)
 	wakeup(s);//wake up process that are waiting for s
 	return 0;
 }
+
+int 
+copy_sem_descriptor(struct proc* pfrom,struct proc* pto)
+{
+	int i;
+
+	if (pfrom == 0 || pto == 0)
+			return -1;
+	for (i = 0; i<MAXSEMPROC; i++){
+  	if (pfrom->sems[i] != -1){
+  			pto->sems[i] = pfrom->sems[i];
+  			pto->amountcsems++;
+ 				acquire(&semtable.lock);
+ 				semtable.list[pfrom->sems[i]].refcount++;
+ 				release(&semtable.lock);
+  	}
+ }
+ return 0;
+}

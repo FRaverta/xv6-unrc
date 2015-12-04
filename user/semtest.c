@@ -16,13 +16,10 @@ and consumer reads these.
 int main(int argc, char *argv[]){
 	int fd;
 	fd=open("number.txt",O_CREATE|O_RDWR);
-	close(fd);
 	int full= semget(-1,1);
 	int empty= semget(-1,0);
 	if(fork()==0){//producer		
 		int i;
-		semget(full,1);
-		semget(empty,0);
 		for(i=0;i<12;i++){			
 			semdown(full);
 			fseek(fd,0); //move logical cursor to the begin
